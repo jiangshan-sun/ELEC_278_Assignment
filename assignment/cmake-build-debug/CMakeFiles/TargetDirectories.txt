@@ -1,0 +1,5 @@
+/Users/sunjiangshan/Desktop/Queen's/ELEC 278 Fnm Of Info Struc/Assignment/assignment/cmake-build-debug/CMakeFiles/model.dir
+/Users/sunjiangshan/Desktop/Queen's/ELEC 278 Fnm Of Info Struc/Assignment/assignment/cmake-build-debug/CMakeFiles/interactive.dir
+/Users/sunjiangshan/Desktop/Queen's/ELEC 278 Fnm Of Info Struc/Assignment/assignment/cmake-build-debug/CMakeFiles/testrunner.dir
+/Users/sunjiangshan/Desktop/Queen's/ELEC 278 Fnm Of Info Struc/Assignment/assignment/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/sunjiangshan/Desktop/Queen's/ELEC 278 Fnm Of Info Struc/Assignment/assignment/cmake-build-debug/CMakeFiles/rebuild_cache.dir
