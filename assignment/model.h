@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#include <stdio.h>
 
 // Initializes the data structure.
 //
@@ -41,5 +42,8 @@ bool is_formula(const char *str);
 
 // Function to evaluate a formula and return the computed value.
 char *evaluate_formula(const char* formula);
+
+// Get the Row and Col number of corresponding cell.
+bool find_cell(const char *cell, int *out);
 
 #endif //ASSIGNMENT_MODEL_H

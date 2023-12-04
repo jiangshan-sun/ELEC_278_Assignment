@@ -5,6 +5,7 @@
 #include "tests.h"
 
 void run_tests() {
+    model_init();
     set_cell_value(ROW_2, COL_A, strdup("1.4"));
     assert_display_text(ROW_2, COL_A, strdup("1.4"));
     set_cell_value(ROW_2, COL_B, strdup("2.9"));

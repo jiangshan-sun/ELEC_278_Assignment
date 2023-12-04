@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 enum CellType {
     FORMULA,
@@ -46,6 +45,7 @@ void set_cell_value(ROW row, COL col, char *text) {
     // Determine if it is a formula.
     if (is_formula(spreadsheet[row][col].value)) {
         // Evaluate the validity.
+        spreadsheet[row][col].value = evaluate_formula(spreadsheet[row][col].value);
         spreadsheet[row][col].type = FORMULA;
     } else if (is_number(spreadsheet[row][col].value))
         spreadsheet[row][col].type = NUMBER;
@@ -77,11 +77,9 @@ bool starts_with(const char *str, const char *prefix) {
 }
 
 bool is_number(const char *str) {
-    bool out;
+    bool out = true;
     for (int i = 0; i < strlen(str); ++i) {
-        if (isdigit(str[i]) || str[i] == '.' )
-            out = true;
-        else
+        if ( !(isdigit(str[i]) || str[i] == '.') )
             out = false;
     }
     return out;
@@ -96,13 +94,16 @@ bool is_formula(const char *str) {
         out = false;
     return out;
 }
+
+
 char *evaluate_formula(const char* formula) {
     // For simplicity, this example assumes a basic formula with addition only
     // You need to implement a more comprehensive formula evaluation based on your requirements
     char delims[] = "+";  // Can be modified to support more formula evaluation.
-    char *result = NULL;
+    char *result = (char *) malloc(sizeof (char ) * (CELL_DISPLAY_WIDTH + 1));
     size_t num_token = 0;   // Count of token.
-    char **tokens = (char **) malloc(sizeof (char **) * (strlen(formula) + 1));
+    double formula_value = 0.0;
+    char **tokens = (char **) malloc(sizeof (char *) * (strlen(formula) + 1));
     char **iterator = tokens;
     char* token = strtok((char*)formula + 1, delims);
     while (token != NULL) {
@@ -112,7 +113,34 @@ char *evaluate_formula(const char* formula) {
         token = strtok(NULL, "+");
     }
     for (int i = 0; i < num_token; ++i) {
-        printf("token: %s \n",tokens[i]);
+        // printf("token: %s \n",tokens[i]);
+        if(is_number(tokens[i])) {
+            // Parse the number to 'double'.
+            formula_value += strtod(tokens[i],NULL);
+        } else{
+            int Row_Col_num[2];
+            find_cell(tokens[i],Row_Col_num);
+            // printf("%s ",spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value);
+            formula_value += strtod(spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value,NULL);
+        }
     }
+    snprintf(result,CELL_DISPLAY_WIDTH + 1,"%g",formula_value);
+    // used for debug.
+    printf("formula value: %s",result);
+    free(tokens);
     return result;
 }
+
+bool find_cell(const char *cell, int *out) {
+    // Row and Col number.
+    char col = cell[0];
+    char row = cell[1];
+    int col_num = col - 'A';
+    int row_num = row - '1';
+    out[0] = row_num;   // Row number.
+    out[1] = col_num;   // Col number.
+
+    return true;
+}
+
+

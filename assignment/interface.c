@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <ncurses.h>
 #include <stdlib.h>
+
 #include <string.h>
 
 #define DEFAULT_EDIT_SIZE 128
