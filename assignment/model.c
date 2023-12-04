@@ -12,7 +12,8 @@ enum CellType {
 
 typedef struct Cell{
     enum CellType type;
-    char *value; // Value that cell storages.
+    char *value; // Storage value.
+    char *formula;   // Storage formula.
 } Cell;
 
 Cell spreadsheet[NUM_ROWS][NUM_COLS];
@@ -46,6 +47,7 @@ void set_cell_value(ROW row, COL col, char *text) {
     if (is_formula(spreadsheet[row][col].value)) {
         // Evaluate the validity.
         spreadsheet[row][col].value = evaluate_formula(spreadsheet[row][col].value);
+        spreadsheet[row][col].formula = strdup(text);
         spreadsheet[row][col].type = FORMULA;
     } else if (is_number(spreadsheet[row][col].value))
         spreadsheet[row][col].type = NUMBER;
@@ -68,7 +70,10 @@ void clear_cell(ROW row, COL col) {
 char *get_textual_value(ROW row, COL col) {
     // TODO: implement this.
     char *out = NULL;
-    out = strdup(spreadsheet[row][col].value);
+    if (spreadsheet[row][col].type == FORMULA)
+        out = strdup(spreadsheet[row][col].formula);
+    else
+        out = strdup(spreadsheet[row][col].value);
     return out;
 }
 
@@ -126,7 +131,7 @@ char *evaluate_formula(const char* formula) {
     }
     snprintf(result,CELL_DISPLAY_WIDTH + 1,"%g",formula_value);
     // used for debug.
-    printf("formula value: %s",result);
+    //printf("formula value: %s",result);
     free(tokens);
     return result;
 }
