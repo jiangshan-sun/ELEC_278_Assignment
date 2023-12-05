@@ -11,10 +11,10 @@ enum CellType {
 };
 
 typedef struct Cell{
-    enum CellType type;
+    enum CellType type; // Cell type.
     char *value; // Storage value.
     char *formula;   // Storage formula itself.
-    struct Cell *dependency;    // Relevant cell.
+    struct Cell *dependency;    // Pointer to dependent cell.
     ROW row;    // Row number.
     COL col;    // Col number.
     size_t change;  // Counts of changes.
@@ -55,17 +55,22 @@ void set_cell_value(ROW row, COL col, char *text) {
     // Determine the type.
     // Determine if it is a formula.
     if (is_formula(spreadsheet[row][col].value)) {
-        // Evaluate the validity.
+        // Evaluate the formula and save the results to value.
         spreadsheet[row][col].value = evaluate_formula(spreadsheet[row][col].value,row,col);
+        // Save the formula equation.
         spreadsheet[row][col].formula = strdup(text);
-
         spreadsheet[row][col].type = FORMULA;
     } else if (is_number(spreadsheet[row][col].value)){
         spreadsheet[row][col].type = NUMBER;
+        // Add change counts.
         spreadsheet[row][col].change++;
         if (spreadsheet[row][col].change > 1) {
+            // Skip the first modification.
             Cell *dpd = spreadsheet[row][col].dependency;
-            dpd->value = strdup(evaluate_formula(dpd->formula,dpd->row,dpd->col));
+            // Free old value.
+            free(dpd->value);
+            // Update the dependent cell.
+            dpd->value = evaluate_formula(dpd->formula,dpd->row,dpd->col);
             update_cell_display(dpd->row,dpd->col,dpd->value);
         }
     }else
