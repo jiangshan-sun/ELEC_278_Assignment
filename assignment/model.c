@@ -13,7 +13,14 @@ enum CellType {
 typedef struct Cell{
     enum CellType type;
     char *value; // Storage value.
-    char *formula;   // Storage formula.
+    char *formula;   // Storage formula itself.
+    // TODO: Add a relevant variable.
+    struct Cell *dependency;    // Relevant cell.
+    // Cell position.
+    ROW row;
+    COL col;
+    size_t change;
+
 } Cell;
 
 Cell spreadsheet[NUM_ROWS][NUM_COLS];
@@ -33,6 +40,11 @@ void model_init() {
             // Initialize all cells to be empty.
             spreadsheet[i][j].type = TEXT;  // Initialize the type to TEXT.
             spreadsheet[i][j].value = strdup("");   // Allocate memories.
+            spreadsheet[i][j].formula = strdup("");
+            spreadsheet[i][j].dependency = NULL;
+            spreadsheet[i][j].row = i;
+            spreadsheet[i][j].col = j;
+            spreadsheet[i][j].change = 0;
         }
     }
 }
@@ -46,12 +58,19 @@ void set_cell_value(ROW row, COL col, char *text) {
     // Determine if it is a formula.
     if (is_formula(spreadsheet[row][col].value)) {
         // Evaluate the validity.
-        spreadsheet[row][col].value = evaluate_formula(spreadsheet[row][col].value);
+        spreadsheet[row][col].value = evaluate_formula(spreadsheet[row][col].value,row,col);
         spreadsheet[row][col].formula = strdup(text);
+
         spreadsheet[row][col].type = FORMULA;
-    } else if (is_number(spreadsheet[row][col].value))
+    } else if (is_number(spreadsheet[row][col].value)){
         spreadsheet[row][col].type = NUMBER;
-    else
+        spreadsheet[row][col].change++;
+        if (spreadsheet[row][col].change > 1) {
+            Cell *dpd = spreadsheet[row][col].dependency;
+            dpd->value = strdup(evaluate_formula(dpd->formula,dpd->row,dpd->col));
+            update_cell_display(dpd->row,dpd->col,dpd->value);
+        }
+    }else
         spreadsheet[row][col].type = TEXT;
 
     // This just displays the text without saving it in any data structure. You will need to change this.
@@ -101,7 +120,7 @@ bool is_formula(const char *str) {
 }
 
 
-char *evaluate_formula(const char* formula) {
+char *evaluate_formula(const char* formula,ROW row,COL col) {
     // For simplicity, this example assumes a basic formula with addition only
     // You need to implement a more comprehensive formula evaluation based on your requirements
     char delims[] = "+";  // Can be modified to support more formula evaluation.
@@ -120,15 +139,26 @@ char *evaluate_formula(const char* formula) {
     for (int i = 0; i < num_token; ++i) {
         // printf("token: %s \n",tokens[i]);
         if(is_number(tokens[i])) {
+            // Token is number.
             // Parse the number to 'double'.
             formula_value += strtod(tokens[i],NULL);
         } else{
+            // Token is cell.
             int Row_Col_num[2];
+            // Find corresponding cell.
             find_cell(tokens[i],Row_Col_num);
             // printf("%s ",spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value);
             formula_value += strtod(spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value,NULL);
+            // Add dependency.
+            spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency = &(spreadsheet[row][col]);
+            /*
+            printf("relevant cell: %d %d\n",
+                   spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency->row,
+                   spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency->col);
+            */
         }
     }
+    // Convert to 'string'.
     snprintf(result,CELL_DISPLAY_WIDTH + 1,"%g",formula_value);
     // used for debug.
     //printf("formula value: %s",result);
@@ -144,7 +174,6 @@ bool find_cell(const char *cell, int *out) {
     int row_num = row - '1';
     out[0] = row_num;   // Row number.
     out[1] = col_num;   // Col number.
-
     return true;
 }
 

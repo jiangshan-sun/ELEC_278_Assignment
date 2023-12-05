@@ -41,7 +41,7 @@ bool is_number(const char *str);
 bool is_formula(const char *str);
 
 // Function to evaluate a formula and return the computed value.
-char *evaluate_formula(const char* formula);
+char *evaluate_formula(const char* formula,ROW row,COL col);
 
 // Get the Row and Col number of corresponding cell.
 bool find_cell(const char *cell, int *out);
