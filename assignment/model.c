@@ -14,12 +14,10 @@ typedef struct Cell{
     enum CellType type;
     char *value; // Storage value.
     char *formula;   // Storage formula itself.
-    // TODO: Add a relevant variable.
     struct Cell *dependency;    // Relevant cell.
-    // Cell position.
-    ROW row;
-    COL col;
-    size_t change;
+    ROW row;    // Row number.
+    COL col;    // Col number.
+    size_t change;  // Counts of changes.
 
 } Cell;
 
@@ -125,11 +123,20 @@ char *evaluate_formula(const char* formula,ROW row,COL col) {
     // You need to implement a more comprehensive formula evaluation based on your requirements
     char delims[] = "+";  // Can be modified to support more formula evaluation.
     char *result = (char *) malloc(sizeof (char ) * (CELL_DISPLAY_WIDTH + 1));
+    if (result == NULL) {
+        fprintf(stderr, "Fatal: failed to allocate memories.\n");
+        abort();
+    }
     size_t num_token = 0;   // Count of token.
     double formula_value = 0.0;
+    char *formula_text = strdup(formula);   // A copy of formula.
     char **tokens = (char **) malloc(sizeof (char *) * (strlen(formula) + 1));
+    if (tokens == NULL) {
+        fprintf(stderr, "Fatal: failed to allocate memories.\n");
+        abort();
+    }
     char **iterator = tokens;
-    char* token = strtok((char*)formula + 1, delims);
+    char* token = strtok(formula_text + 1, delims);
     while (token != NULL) {
         *iterator = strdup(token);
         iterator ++;
@@ -147,21 +154,18 @@ char *evaluate_formula(const char* formula,ROW row,COL col) {
             int Row_Col_num[2];
             // Find corresponding cell.
             find_cell(tokens[i],Row_Col_num);
-            // printf("%s ",spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value);
-            formula_value += strtod(spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value,NULL);
-            // Add dependency.
-            spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency = &(spreadsheet[row][col]);
-            /*
-            printf("relevant cell: %d %d\n",
-                   spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency->row,
-                   spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency->col);
-            */
+            if (spreadsheet[Row_Col_num[0]][Row_Col_num[1]].type == TEXT) {
+                fprintf(stderr," Can not evaluate TEXT!\n");
+                abort();
+            } else {
+                formula_value += strtod(spreadsheet[Row_Col_num[0]][Row_Col_num[1]].value,NULL);
+                // Add dependency.
+                spreadsheet[Row_Col_num[0]][Row_Col_num[1]].dependency = &(spreadsheet[row][col]);
+            }
         }
     }
     // Convert to 'string'.
     snprintf(result,CELL_DISPLAY_WIDTH + 1,"%g",formula_value);
-    // used for debug.
-    //printf("formula value: %s",result);
     free(tokens);
     return result;
 }
