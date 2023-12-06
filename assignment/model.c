@@ -114,7 +114,6 @@ bool is_number(const char *str) {
 
 bool is_formula(const char *str) {
     bool out;   // The output.
-    // TODO: Need to check cell validity.
     if (starts_with(str,"="))
         out = true;
     else
