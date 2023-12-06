@@ -132,8 +132,8 @@ Manual testing was performed to cover basic use cases, formula evaluations, and 
 
 #### Screenshots
 1. Type '1.2' into cell 'A1', type '1.9' into cell 'B2', type '=A1+B2' into cell 'C3' and then press 'enter'.
-   The programme can get the value '3.1' which indicates that the programme can set the cell value and evaluate the formula
-   successfully.
+The programme can get the value '3.1' which indicates that the programme can set the cell value and evaluate the formula
+successfully.
    <img alt="Initial Spreadsheet" src="/Users/sunjiangshan/Desktop/Queen&#39;s/ELEC 278 Fnm Of Info Struc/Assignment/Test/Screenshot 2023-12-06 at 15.22.39.png"/>
 *Figure 1: Initial Spreadsheet State*
 
@@ -146,7 +146,9 @@ the `clear_cell` function works.
    <img alt="Updated Spreadsheet" src="/Users/sunjiangshan/Desktop/Queen&#39;s/ELEC 278 Fnm Of Info Struc/Assignment/Test/Screenshot 2023-12-06 at 15.23.55.png"/>
 *Figure 3: Spreadsheet After Value Update*
 
-### Citations
+---
+
+## 3. Citations
 
 1. [Convert double/float to string](https://stackoverflow.com/questions/7228438/convert-double-float-to-string)
 2. [C Program For Double to String Conversion](https://www.geeksforgeeks.org/c-program-for-double-to-string-conversion/)
