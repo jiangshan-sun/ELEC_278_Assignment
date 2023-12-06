@@ -23,14 +23,6 @@ typedef struct Cell{
 
 Cell spreadsheet[NUM_ROWS][NUM_COLS];
 
-// Represents an error that occurred in the input.
-struct error {
-    // The position in the input string where the error occurred.
-    const char *pos;
-    // A description of the error; this must be a string literal, not a dynamically allocated string.
-    const char *desc;
-};
-
 void model_init() {
     // TODO: implement this.
     for (int i = 0; i < NUM_ROWS; ++i) {
@@ -85,6 +77,9 @@ void clear_cell(ROW row, COL col) {
     // TODO: implement this.
     spreadsheet[row][col].value = strdup("");
     spreadsheet[row][col].type = TEXT;
+    spreadsheet[row][col].formula = strdup("");
+    spreadsheet[row][col].change = 0;
+    spreadsheet[row][col].dependency = NULL;
     // This just clears the display without updating any data structure. You will need to change this.
     update_cell_display(row, col, spreadsheet[row][col].value);
 }
@@ -148,7 +143,6 @@ char *evaluate_formula(const char* formula,ROW row,COL col) {
         token = strtok(NULL, "+");
     }
     for (int i = 0; i < num_token; ++i) {
-        // printf("token: %s \n",tokens[i]);
         if(is_number(tokens[i])) {
             // Token is number.
             // Parse the number to 'double'.
